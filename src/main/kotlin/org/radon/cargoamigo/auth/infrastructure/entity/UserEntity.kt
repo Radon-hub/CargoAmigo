@@ -1,41 +1,49 @@
 package org.radon.cargoamigo.auth.infrastructure.entity
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.Table
-import org.radon.cargoamigo.common.UserRole
+import jakarta.persistence.*
+import lombok.AllArgsConstructor
+import lombok.Getter
+import lombok.Setter
 import org.radon.cargoamigo.common.UserType
-import java.util.UUID
+import java.util.*
 
 @Entity
 @Table(name = "users")
-data class UserEntity(
+@AllArgsConstructor
+ class UserEntity{
+
     @Id
     @GeneratedValue(
         strategy = GenerationType.UUID
     )
-    val id: UUID,
+     var id: UUID? = null
     @Column(nullable = false)
-    val firstName: String,
+     var firstName: String = ""
     @Column(nullable = false)
-    val lastName: String,
+     var lastName: String = ""
     @Column(nullable = false)
-    val age: Byte,
+     var age: Byte = 0
     @Column(nullable = false,unique = true)
-    val phoneNumber: String,
+     var phoneNumber: String = ""
     @Column(nullable = false)
-    val password: String,
+     var password: String = ""
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id")
+     var roleEntity: RoleEntity? = null
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    val role: UserRole,
-    @Enumerated(EnumType.STRING)
+     var type: UserType = UserType.EMPLOYER
     @Column(nullable = false)
-    val type: UserType,
-    @Column(nullable = false)
-    val enabled: Boolean = true,
-)
+     var enabled: Boolean = true
+
+    constructor(firstName: String, lastName: String, age: Byte, phoneNumber: String, password: String, roleEntity: RoleEntity,type: UserType,enabled: Boolean) {
+        this.firstName = firstName
+        this.lastName = lastName
+        this.age = age
+        this.phoneNumber = phoneNumber
+        this.password = password
+        this.roleEntity = roleEntity
+        this.type = type
+        this.enabled = enabled
+    }
+}
