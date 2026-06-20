@@ -8,7 +8,7 @@ import org.radon.cargoamigo.common.exceptionHandling.PasswordMismatchException
 import org.radon.cargoamigo.common.exceptionHandling.PhoneNumberCanNotBeNullException
 import org.radon.cargoamigo.common.isEmptyOrBlank
 
-class SignupRequest(
+data class SignupRequest(
     var firstname: String,
     var lastname: String,
     var phone: String,
@@ -23,6 +23,6 @@ class SignupRequest(
         if(phone.isEmptyOrBlank()) throw PhoneNumberCanNotBeNullException()
         if(password.isEmptyOrBlank()) throw FieldMustNotBeEmptyException("Password")
         if(password != passwordConfirmation) throw PasswordMismatchException()
-        if(age > 18 && age < 90) throw InvalidAgeException()
+        if(age < 18 || age > 90) throw InvalidAgeException()
     }
 }

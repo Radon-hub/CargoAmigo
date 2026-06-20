@@ -31,7 +31,7 @@ class AuthController(
     }
 
     @PostMapping("login")
-    fun login(@RequestBody request: LoginRequest): ResponseEntity<Response<LoginResponse>> {
+        fun login(@RequestBody request: LoginRequest): ResponseEntity<Response<LoginResponse>> {
         val result = loginUseCase.login(request)
         return ResponseEntity.ok(Response(AuthMappers.convertTokensToLoginResponse(result)))
     }
