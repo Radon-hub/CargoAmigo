@@ -2,8 +2,7 @@ package org.radon.cargoamigo.auth.infrastructure.entity
 
 import jakarta.persistence.*
 import lombok.AllArgsConstructor
-import lombok.Getter
-import lombok.Setter
+import org.radon.cargoamigo.cargo.infrastructure.db.CargoEntity
 import org.radon.cargoamigo.common.UserType
 import java.util.*
 
@@ -35,7 +34,10 @@ import java.util.*
      var type: UserType = UserType.EMPLOYER
     @Column(nullable = false)
      var enabled: Boolean = true
-
+    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
+    var cargos:MutableList<CargoEntity> = mutableListOf()
+    @OneToMany(mappedBy = "driver", fetch = FetchType.LAZY)
+    var deliverCargos:MutableList<CargoEntity> = mutableListOf()
     constructor(firstName: String, lastName: String, age: Byte, phoneNumber: String, password: String, roleEntity: RoleEntity,type: UserType,enabled: Boolean) {
         this.firstName = firstName
         this.lastName = lastName
