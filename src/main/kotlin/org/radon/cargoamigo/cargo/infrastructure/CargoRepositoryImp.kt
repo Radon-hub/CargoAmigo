@@ -7,8 +7,12 @@ import org.radon.cargoamigo.cargo.domain.CargoStatus
 import org.radon.cargoamigo.cargo.domain.CodeGenerator
 import org.radon.cargoamigo.cargo.domain.toCargo
 import org.radon.cargoamigo.cargo.domain.toCargoEntity
+import org.radon.cargoamigo.cargo.domain.toCargoResponse
+import org.radon.cargoamigo.cargo.infrastructure.db.CargoEntity
 import org.radon.cargoamigo.cargo.infrastructure.db.CargoJpaRepository
+import org.radon.cargoamigo.cargo.infrastructure.db.CargoSpecifications
 import org.radon.cargoamigo.cargo.presentation.dto.AcceptDeliveryRequest
+import org.radon.cargoamigo.cargo.presentation.dto.CargoResponse
 import org.radon.cargoamigo.cargo.presentation.dto.RemoveCargoRequest
 import org.radon.cargoamigo.common.UserType
 import org.radon.cargoamigo.common.exceptionHandling.CargoCanNotBeAccepted
@@ -16,16 +20,17 @@ import org.radon.cargoamigo.common.exceptionHandling.CargoCodeCanNotBeNullExcept
 import org.radon.cargoamigo.common.exceptionHandling.CargoNotBelongsToUserException
 import org.radon.cargoamigo.common.exceptionHandling.CargoNotFoundException
 import org.radon.cargoamigo.common.exceptionHandling.CargoStatusCanNotBeChanged
-import org.radon.cargoamigo.common.exceptionHandling.ExceptionModel
 import org.radon.cargoamigo.common.exceptionHandling.FieldMustNotBeEmptyException
 import org.radon.cargoamigo.common.exceptionHandling.UserNotFoundException
-import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Repository
 import java.sql.Timestamp
 
 @Repository
 class CargoRepositoryImp(
-    private val repository: CargoJpaRepository,
+    private val cargoRepository: CargoJpaRepository,
     private val userRepository: UserJpaRepository
 ): CargoRepository {
 
@@ -34,7 +39,7 @@ class CargoRepositoryImp(
 
         val user = userRepository.findUserByPhoneNumber(request.username).orElseThrow { UserNotFoundException() }
 
-        val cargo = repository.findCargoByCode(request.code).orElseThrow { CargoNotFoundException() }
+        val cargo = cargoRepository.findCargoByCode(request.code).orElseThrow { CargoNotFoundException() }
 
         if(cargo.status != CargoStatus.ACTIVE){
             throw CargoCanNotBeAccepted()
@@ -58,7 +63,7 @@ class CargoRepositoryImp(
 
         val code = CodeGenerator.generateCode()
 
-        if(repository.findCargoByCode(code).isPresent){
+        if(cargoRepository.findCargoByCode(code).isPresent){
             return addNewCargo(request)
         }
 
@@ -70,7 +75,7 @@ class CargoRepositoryImp(
 
         cargo.owner = owner
 
-        repository.saveAndFlush(cargo)
+        cargoRepository.saveAndFlush(cargo)
 
         return cargo.code!!
 
@@ -78,7 +83,7 @@ class CargoRepositoryImp(
 
     override fun removeCargo(request: RemoveCargoRequest): String {
 
-        val cargo = repository.findCargoByCode(request.code).orElseThrow { CargoNotFoundException() }
+        val cargo = cargoRepository.findCargoByCode(request.code).orElseThrow { CargoNotFoundException() }
 
         if(cargo.owner?.phoneNumber != request.username){
             throw CargoNotBelongsToUserException()
@@ -96,7 +101,7 @@ class CargoRepositoryImp(
 
     override fun updateCargo(request: Cargo): String {
 
-        val cargo = repository.findCargoByCode(request.code ?: throw CargoCodeCanNotBeNullException()).orElseThrow { CargoNotFoundException() }
+        val cargo = cargoRepository.findCargoByCode(request.code ?: throw CargoCodeCanNotBeNullException()).orElseThrow { CargoNotFoundException() }
 
         if(cargo.owner?.phoneNumber != request.owner?.username){
             throw CargoNotBelongsToUserException()
@@ -116,5 +121,36 @@ class CargoRepositoryImp(
         cargo.destination = request.destination
 
         return cargo.code!!
+    }
+
+    override fun getCargos(
+        deadLine: Timestamp?,
+        status: CargoStatus?,
+        price: Double?,
+        ownerPhoneNumber: String?,
+        driverPhoneNumber: String?,
+        pageable: Pageable
+    ): Page<CargoResponse> {
+
+        var spec: Specification<CargoEntity> = Specification.allOf()
+
+        deadLine?.let {
+            spec = spec.and(CargoSpecifications.deadLineEquals(it))
+        }
+        status?.let {
+            spec = spec.and(CargoSpecifications.statusEquals(it))
+        }
+        price?.let {
+            spec = spec.and(CargoSpecifications.priceBiggerThan(it))
+        }
+        ownerPhoneNumber?.let {
+            spec = spec.and(CargoSpecifications.ownerEquals(it))
+        }
+        driverPhoneNumber?.let {
+            spec = spec.and(CargoSpecifications.driverEquals(it))
+        }
+
+        return cargoRepository.findAll(spec, pageable).map { it.toCargo().toCargoResponse() }
+
     }
 }
