@@ -1,5 +1,0 @@
-spring:
-    application:
-      name: CargoAmigo
-    profiles:
-      active: dev
