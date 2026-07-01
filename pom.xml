@@ -18,6 +18,9 @@
     <modules>
         <module>common</module>
         <module>application</module>
+        <module>cargo-service</module>
+        <module>user-service</module>
+        <module>contracts</module>
     </modules>
 
     <properties>
@@ -36,16 +39,8 @@
                             <arg>-Xjsr305=strict</arg>
                             <arg>-Xannotation-default-target=param-property</arg>
                         </args>
-                        <compilerPlugins>
-                            <plugin>spring</plugin>
-                            <plugin>jpa</plugin>
-                            <plugin>all-open</plugin>
-                        </compilerPlugins>
-                        <pluginOptions>
-                            <option>all-open:annotation=jakarta.persistence.Entity</option>
-                            <option>all-open:annotation=jakarta.persistence.MappedSuperclass</option>
-                            <option>all-open:annotation=jakarta.persistence.Embeddable</option>
-                        </pluginOptions>
+
+
                     </configuration>
                     <dependencies>
                         <dependency>
