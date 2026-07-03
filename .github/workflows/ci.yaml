@@ -1,0 +1,16 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+      - master
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print message
+        run: echo "Hello i am all set!"
