@@ -8,9 +8,15 @@ on:
       - master
 
 jobs:
-  hello:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print message
-        run: echo "Hello i am all set!"
+      - name: Start
+        run: echo "Start building project!"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Show files
+        run: ls -la
