@@ -20,7 +20,6 @@ import org.radon.cargoamigo.common.exceptionHandling.CargoCodeCanNotBeNullExcept
 import org.radon.cargoamigo.common.exceptionHandling.CargoNotBelongsToUserException
 import org.radon.cargoamigo.common.exceptionHandling.CargoNotFoundException
 import org.radon.cargoamigo.common.exceptionHandling.CargoStatusCanNotBeChanged
-import org.radon.cargoamigo.common.exceptionHandling.FieldMustNotBeEmptyException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
@@ -55,19 +54,19 @@ open class CargoRepositoryImp(
 
     }
 
-    override fun addNewCargo(request: Cargo,owner:UserContractDto): String {
+    override fun addNewCargo(request: Cargo, user:UserContractDto): String {
 
         val code = CodeGenerator.generateCode()
 
         if(cargoRepository.findCargoByCode(code).isPresent){
-            return addNewCargo(request,owner)
+            return addNewCargo(request,user)
         }
 
         val cargo = request.toCargoEntity()
 
         cargo.code = code
 
-        cargo.ownerId = owner.id
+        cargo.ownerId = user.id
 
         cargoRepository.saveAndFlush(cargo)
 

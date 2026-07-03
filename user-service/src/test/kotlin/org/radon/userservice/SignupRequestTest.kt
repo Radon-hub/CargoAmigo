@@ -10,17 +10,19 @@ import org.radon.cargoamigo.common.exceptionHandling.InvalidAgeException
 import org.radon.cargoamigo.common.exceptionHandling.PhoneNumberCanNotBeNullException
 import org.radon.userservice.common.exceptionHandling.PasswordMismatchException
 import org.radon.userservice.presentation.dto.SignupRequest
+import org.slf4j.LoggerFactory
 
 class SignupRequestTest {
 
     var singUpModel = SignupRequest("", "", "", "", "", 0, UserType.EMPLOYER)
+    val logger = LoggerFactory.getLogger(SignupRequestTest::class.java)
 
     @Test
     fun `should throw on first name`() {
         assertThrows(FieldMustNotBeEmptyException::class.java){
             singUpModel.validateRequest()
         }
-        println("FieldMustNotBeEmptyException happen on first name = empty")
+        logger.info("FieldMustNotBeEmptyException happen on first name = empty")
     }
 
     @Test
@@ -28,7 +30,7 @@ class SignupRequestTest {
         assertThrows(FieldMustNotBeEmptyException::class.java){
             singUpModel.copy("Jon").validateRequest()
         }
-        println("FieldMustNotBeEmptyException happen on last name = empty")
+        logger.info("FieldMustNotBeEmptyException happen on last name = empty")
     }
 
     @Test
@@ -36,7 +38,7 @@ class SignupRequestTest {
         assertThrows(PhoneNumberCanNotBeNullException::class.java){
             singUpModel.copy("Jon","Smith").validateRequest()
         }
-        println("PhoneNumberCanNotBeNullException happen on phone number = empty")
+        logger.info("PhoneNumberCanNotBeNullException happen on phone number = empty")
     }
 
     @Test
@@ -44,7 +46,7 @@ class SignupRequestTest {
         assertThrows(FieldMustNotBeEmptyException::class.java){
             singUpModel.copy("Jon","Smith","0214558565").validateRequest()
         }
-        println("FieldMustNotBeEmptyException happen on password = empty")
+        logger.info("FieldMustNotBeEmptyException happen on password = empty")
     }
 
     @Test
@@ -52,7 +54,7 @@ class SignupRequestTest {
         assertThrows(PasswordMismatchException::class.java){
             singUpModel.copy("Jon","Smith","0214558565","1234").validateRequest()
         }
-        println("PasswordMismatchException happen on password mismatch")
+        logger.info("PasswordMismatchException happen on password mismatch")
     }
 
     @Test
@@ -60,7 +62,7 @@ class SignupRequestTest {
         assertThrows(InvalidAgeException::class.java){
             singUpModel.copy("Jon","Smith","0214558565","1234","1234").validateRequest()
         }
-        println("InvalidAgeException happen on age")
+        logger.info("InvalidAgeException happen on age")
     }
 
     @Test
@@ -75,7 +77,7 @@ class SignupRequestTest {
                 21
             ).validateRequest()
         }
-        println("Request is perfect.")
+        logger.info("Request is perfect.")
     }
 
 }

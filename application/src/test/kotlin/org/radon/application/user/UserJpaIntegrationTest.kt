@@ -1,12 +1,14 @@
-package org.radon.application
+package org.radon.application.user
 
 
 import org.junit.jupiter.api.*
+import org.radon.application.CargoAmigoApplication
 import org.radon.cargoamigo.common.UserType
 import org.radon.cargoamigo.common.exceptionHandling.DuplicateUserException
 import org.radon.userservice.application.port.`in`.SignupUseCase
 import org.radon.userservice.infrastructure.jpa.UserJpaRepository
 import org.radon.userservice.presentation.dto.SignupRequest
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import kotlin.jvm.optionals.getOrNull
@@ -21,6 +23,7 @@ class UserJpaIntegrationTest(
     @Autowired
     val signupUseCase: SignupUseCase
 ) {
+    val logger = LoggerFactory.getLogger(UserJpaIntegrationTest::class.java)
 
     @Test
     @Order(1)
@@ -29,15 +32,15 @@ class UserJpaIntegrationTest(
 
         val result = repository.findUserByPhoneNumber("0912345678")
 
-        println("***FROM SAVE****")
+        logger.info("***FROM SAVE****")
 
-        println("find user : ${result}")
+        logger.info("find user : ${result}")
 
         if (result.isEmpty) {
-            println("User not exists...")
+            logger.info("User not exists...")
             assertNull(result.getOrNull())
         }else{
-            println("User exists ...")
+            logger.info("User exists ...")
             assertEquals("alirezza", result.get().firstName)
         }
 
@@ -61,17 +64,17 @@ class UserJpaIntegrationTest(
             )
         }
 
-        println("***FROM DELETE****")
+        logger.info("***FROM DELETE****")
         val result = repository.findUserByPhoneNumber("0912345678")
 
-        println("Find user : $result")
+        logger.info("Find user : $result")
 
         if(result.isPresent){
             repository.delete(result.get())
-            println("User deleted!")
+            logger.info("User deleted!")
             assert(true)
         }else{
-            println("User not found.")
+            logger.info("User not found.")
             assertNull(result.getOrNull())
         }
 
