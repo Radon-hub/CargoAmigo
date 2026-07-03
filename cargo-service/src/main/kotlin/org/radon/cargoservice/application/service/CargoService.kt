@@ -1,13 +1,8 @@
 package org.radon.cargoservice.application.service
 
-import dto.UserContractDto
 import jakarta.transaction.Transactional
 import org.radon.cargoamigo.common.exceptionHandling.UserNotFoundException
-import org.radon.cargoservice.application.port.`in`.AcceptDeliveryUseCase
-import org.radon.cargoservice.application.port.`in`.AddNewCargoUseCase
-import org.radon.cargoservice.application.port.`in`.GetCargosUseCase
-import org.radon.cargoservice.application.port.`in`.RemoveCargoUseCase
-import org.radon.cargoservice.application.port.`in`.UpdateCargoUseCase
+import org.radon.cargoservice.application.port.`in`.*
 import org.radon.cargoservice.application.port.out.CargoRepository
 import org.radon.cargoservice.domain.CargoStatus
 import org.radon.cargoservice.domain.toCargo
@@ -18,9 +13,8 @@ import org.radon.cargoservice.presentation.dto.CargoResponse
 import org.radon.cargoservice.presentation.dto.RemoveCargoRequest
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
-import port.GetUserWithIdUseCase
+import port.GetContextUserUseCase
 import port.GetUserWithPhoneNumberUseCase
 import java.sql.Timestamp
 
@@ -28,20 +22,11 @@ import java.sql.Timestamp
 open class CargoService(
     private val cargoRepository: CargoRepository,
     private val getUserWithPhoneNumberUseCase: GetUserWithPhoneNumberUseCase,
-    private val getUserWithIdUseCase: GetUserWithIdUseCase
+    private val getContextUserUseCase: GetContextUserUseCase
 ): AcceptDeliveryUseCase, AddNewCargoUseCase, RemoveCargoUseCase, UpdateCargoUseCase, GetCargosUseCase {
 
-    fun getUserName(): String {
-        return SecurityContextHolder
-            .getContext()
-            .authentication?.name ?: "Unknown"
-    }
-
-    fun getUser(): UserContractDto {
-        return SecurityContextHolder
-            .getContext()
-            .authentication?.principal as UserContractDto
-    }
+    fun getUserName() = getContextUserUseCase.getUser().phoneNumber ?: "Unknown"
+    fun getUser() = getContextUserUseCase.getUser()
 
     @Transactional
     override fun acceptCargo(cargoCode: String): CargoResponse {
@@ -55,10 +40,8 @@ open class CargoService(
     @Transactional
     override fun addNewCargo(request: CargoRequest): String {
         return cargoRepository.addNewCargo(
-            request.toCargo().copy(
-                ownerId = getUser().id
-            ),
-            getUserWithIdUseCase.getWithId(getUser().id ?: throw UserNotFoundException())
+            request.toCargo(),
+            getUserWithPhoneNumberUseCase.getWithPhoneNumber(getUser().phoneNumber ?: throw UserNotFoundException())
         )
     }
 
@@ -76,10 +59,8 @@ open class CargoService(
     @Transactional
     override fun updateCargo(request: CargoRequest): String {
         return cargoRepository.updateCargo(
-            request.toCargo().copy(
-                ownerId = getUser().id
-            ),
-            getUserWithIdUseCase.getWithId(getUser().id ?: throw UserNotFoundException())
+            request.toCargo(),
+            getUserWithPhoneNumberUseCase.getWithPhoneNumber(getUser().phoneNumber ?: throw UserNotFoundException())
         )
     }
     @Transactional

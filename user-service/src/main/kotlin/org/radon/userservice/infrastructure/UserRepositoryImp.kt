@@ -33,9 +33,10 @@ open class UserRepositoryImp(
             throw PhoneNumberCanNotBeNullException()
         }
 
-        userJpaRepository.findUserByPhoneNumber(
-            user.phoneNumber
-        ).orElseThrow { DuplicateUserException() }
+        if(userJpaRepository.findUserByPhoneNumber(user.phoneNumber).isPresent){
+            throw DuplicateUserException()
+        }
+
 
         val pass = passwordEncoder.encode(user.password)
 
