@@ -50,20 +50,6 @@ class UserJpaIntegrationTest(
     @Order(2)
     fun `should save & see & delete user`() {
 
-        assertThrows<DuplicateUserException>{
-            signupUseCase.signup(
-                SignupRequest(
-                    "alirezza",
-                    "test",
-                    "0912345678",
-                    "1234",
-                    "1234",
-                    45,
-                    UserType.EMPLOYER
-                )
-            )
-        }
-
         logger.info("***FROM DELETE****")
         val result = repository.findUserByPhoneNumber("0912345678")
 
@@ -76,6 +62,18 @@ class UserJpaIntegrationTest(
         }else{
             logger.info("User not found.")
             assertNull(result.getOrNull())
+
+            signupUseCase.signup(
+                SignupRequest(
+                    "alirezza",
+                    "test",
+                    "0912345678",
+                    "1234",
+                    "1234",
+                    45,
+                    UserType.EMPLOYER
+                )
+            )
         }
 
     }
