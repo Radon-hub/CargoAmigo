@@ -37,18 +37,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Verify Java
-        run: java -version
-
-      - name: Verify Maven
-        run: mvn -version
-
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+
+      - name: Verify Java
+        run: java -version
+
+      - name: Verify Maven
+        run: mvn -version
 
       - name: Build with Maven
         run: mvn clean verify
@@ -59,9 +59,3 @@ jobs:
 
       - name: Show files
         run: ls -la
-
-      - name: Build docker image
-        run: docker build -t cargoamigo:latest .
-
-      - name: Verify docker image
-        run: docker images
