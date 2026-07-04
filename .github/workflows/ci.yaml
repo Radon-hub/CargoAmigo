@@ -61,7 +61,7 @@ jobs:
         run: ls -la
 
       - name: Build docker image
-        run: docker build -t cargoamigo:latest
+        run: docker build -t cargoamigo:latest .
 
       - name: Verify docker image
         run: docker images
