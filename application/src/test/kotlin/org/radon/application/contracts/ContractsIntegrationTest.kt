@@ -8,6 +8,7 @@ import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.TestMethodOrder
 import org.junit.jupiter.api.assertNotNull
+import org.radon.application.BaseIntegrationTest
 import org.radon.application.CargoAmigoApplication
 import org.radon.cargoamigo.common.UserType
 import org.radon.userservice.application.port.`in`.SignupUseCase
@@ -25,30 +26,13 @@ import kotlin.test.Test
 @Slf4j
 class ContractsIntegrationTest(
     @Autowired val getUserWithIdUseCase: GetUserWithIdUseCase,
-    @Autowired val getUserWithPhoneNumberUseCase: GetUserWithPhoneNumberUseCase,
-    @Autowired val signupUseCase: SignupUseCase
-) {
+    @Autowired val getUserWithPhoneNumberUseCase: GetUserWithPhoneNumberUseCase
+): BaseIntegrationTest() {
 
     companion object {
         lateinit var user: UserContractDto
         val logger = LoggerFactory.getLogger(CargoAmigoApplication::class.java)
     }
-
-    @BeforeEach
-    fun setUp() {
-        signupUseCase.signup(
-            SignupRequest(
-                "alirezza",
-                "test",
-                "09369101332",
-                "1234",
-                "1234",
-                45,
-                UserType.EMPLOYER
-            )
-        )
-    }
-
 
     @Test
     @Order(1)

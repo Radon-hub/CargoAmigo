@@ -2,12 +2,9 @@ package org.radon.application.user
 
 
 import org.junit.jupiter.api.*
+import org.radon.application.BaseIntegrationTest
 import org.radon.application.CargoAmigoApplication
-import org.radon.cargoamigo.common.UserType
-import org.radon.cargoamigo.common.exceptionHandling.DuplicateUserException
-import org.radon.userservice.application.port.`in`.SignupUseCase
 import org.radon.userservice.infrastructure.jpa.UserJpaRepository
-import org.radon.userservice.presentation.dto.SignupRequest
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -18,34 +15,17 @@ import kotlin.test.assertEquals
 @SpringBootTest(classes = [CargoAmigoApplication::class])
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class UserJpaIntegrationTest(
-    @Autowired
-    val repository: UserJpaRepository,
-    @Autowired
-    val signupUseCase: SignupUseCase
-) {
+    @Autowired val repo: UserJpaRepository
+): BaseIntegrationTest() {
     val logger = LoggerFactory.getLogger(UserJpaIntegrationTest::class.java)
 
-    @BeforeEach
-    fun setUp() {
-        signupUseCase.signup(
-            SignupRequest(
-                "alirezza",
-                "test",
-                "0912345678",
-                "1234",
-                "1234",
-                45,
-                UserType.EMPLOYER
-            )
-        )
-    }
 
     @Test
     @Order(1)
     fun `should save and see user`(){
 
 
-        val result = repository.findUserByPhoneNumber("0912345678")
+        val result = repo.findUserByPhoneNumber("0912345678")
 
         logger.info("***FROM SAVE****")
 
@@ -66,12 +46,12 @@ class UserJpaIntegrationTest(
     fun `should save & see & delete user`() {
 
         logger.info("***FROM DELETE****")
-        val result = repository.findUserByPhoneNumber("0912345678")
+        val result = repo.findUserByPhoneNumber("0912345678")
 
         logger.info("Find user : $result")
 
         if(result.isPresent){
-            repository.delete(result.get())
+            repo.delete(result.get())
             logger.info("User deleted!")
             assert(true)
         }else{
