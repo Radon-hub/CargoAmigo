@@ -1,10 +1,12 @@
 package org.radon.application.cargo
 
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.TestMethodOrder
 import org.radon.application.CargoAmigoApplication
 import org.radon.application.user.AuthIntegrationTest
+import org.radon.userservice.application.port.`in`.SignupUseCase
 import org.radon.userservice.domain.Tokens
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,7 +26,7 @@ import kotlin.test.assertNotNull
 @AutoConfigureMockMvc
 class CargoIntegrationTest(
     @Autowired val mockMvc: MockMvc,
-    @Autowired val objectMapper: ObjectMapper
+    @Autowired val objectMapper: ObjectMapper,
 ) {
 
 
@@ -32,6 +34,27 @@ class CargoIntegrationTest(
         lateinit var token: Tokens
         val logger = LoggerFactory.getLogger(AuthIntegrationTest::class.java)
     }
+
+    @BeforeEach
+    fun setUp() {
+        AuthIntegrationTest.Companion.logger.info("************ Sign up flow ***************")
+        val result = mockMvc.perform(
+            post("/auth/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                            {
+                              "firstname": "mamad",
+                              "lastname": "javadi",
+                              "phone": "09369101332",
+                              "password": "123456789",
+                              "passwordConfirmation": "123456789",
+                              "age": 27,
+                              "type": "DRIVER"
+                            }
+                        """)
+        ).andExpect(status().isOk).andReturn()
+    }
+
 
     @Test
     @Order(1)

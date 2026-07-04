@@ -1,6 +1,7 @@
 package org.radon.application.user
 
 
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.TestMethodOrder
@@ -31,6 +32,26 @@ class AuthIntegrationTest(
         val logger = LoggerFactory.getLogger(AuthIntegrationTest::class.java)
     }
 
+    @BeforeEach
+    fun setUp() {
+        logger.info("************ Sign up flow ***************")
+        val result = mockMvc.perform(
+            post("/auth/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                            {
+                              "firstname": "mamad",
+                              "lastname": "javadi",
+                              "phone": "09369101332",
+                              "password": "123456789",
+                              "passwordConfirmation": "123456789",
+                              "age": 27,
+                              "type": "DRIVER"
+                            }
+                        """)
+        ).andExpect(status().isOk).andReturn()
+
+    }
 
     @Test
     @Order(1)
