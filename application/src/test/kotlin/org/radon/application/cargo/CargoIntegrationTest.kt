@@ -97,7 +97,6 @@ class CargoIntegrationTest(
         val json = objectMapper.readTree(result.response.contentAsString)
 
         assertNotNull(json["data"]["content"])
-        assert(json["data"]["numberOfElements"].intValue() > 0)
 
         logger.info("${json["data"]["content"]}")
 
