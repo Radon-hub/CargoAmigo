@@ -12,8 +12,8 @@ class GlobalExceptionHandler {
     @ExceptionHandler(ExceptionModel::class)
     fun handleException(
         ex: ExceptionModel,
-        request: HttpServletRequest
+        request: HttpServletRequest?
     ): ResponseEntity<Response<Nothing?>> {
-        return ex.makeErrorResponse(request.requestURL.toString())
+        return ex.makeErrorResponse(request?.requestURL.toString())
     }
 }

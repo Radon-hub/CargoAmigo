@@ -22,7 +22,7 @@ class SignupRequestTest {
         assertThrows(FieldMustNotBeEmptyException::class.java){
             singUpModel.validateRequest()
         }
-        logger.info("FieldMustNotBeEmptyException happen on first name = empty")
+        logger.debug("FieldMustNotBeEmptyException happen on first name = empty")
     }
 
     @Test
@@ -30,7 +30,7 @@ class SignupRequestTest {
         assertThrows(FieldMustNotBeEmptyException::class.java){
             singUpModel.copy("Jon").validateRequest()
         }
-        logger.info("FieldMustNotBeEmptyException happen on last name = empty")
+        logger.debug("FieldMustNotBeEmptyException happen on last name = empty")
     }
 
     @Test
@@ -38,7 +38,7 @@ class SignupRequestTest {
         assertThrows(PhoneNumberCanNotBeNullException::class.java){
             singUpModel.copy("Jon","Smith").validateRequest()
         }
-        logger.info("PhoneNumberCanNotBeNullException happen on phone number = empty")
+        logger.debug("PhoneNumberCanNotBeNullException happen on phone number = empty")
     }
 
     @Test
@@ -46,7 +46,7 @@ class SignupRequestTest {
         assertThrows(FieldMustNotBeEmptyException::class.java){
             singUpModel.copy("Jon","Smith","0214558565").validateRequest()
         }
-        logger.info("FieldMustNotBeEmptyException happen on password = empty")
+        logger.debug("FieldMustNotBeEmptyException happen on password = empty")
     }
 
     @Test
@@ -54,7 +54,7 @@ class SignupRequestTest {
         assertThrows(PasswordMismatchException::class.java){
             singUpModel.copy("Jon","Smith","0214558565","1234").validateRequest()
         }
-        logger.info("PasswordMismatchException happen on password mismatch")
+        logger.debug("PasswordMismatchException happen on password mismatch")
     }
 
     @Test
@@ -62,8 +62,17 @@ class SignupRequestTest {
         assertThrows(InvalidAgeException::class.java){
             singUpModel.copy("Jon","Smith","0214558565","1234","1234").validateRequest()
         }
-        logger.info("InvalidAgeException happen on age")
+        logger.debug("InvalidAgeException happen on age")
     }
+
+    @Test
+    fun `should throw on age bigger`() {
+        assertThrows(InvalidAgeException::class.java){
+            singUpModel.copy("Jon","Smith","0214558565","1234","1234",100).validateRequest()
+        }
+        logger.debug("InvalidAgeException happen on age")
+    }
+
 
     @Test
     fun `should not throw anything`() {
@@ -77,7 +86,36 @@ class SignupRequestTest {
                 21
             ).validateRequest()
         }
-        logger.info("Request is perfect.")
+        logger.debug("Request is perfect.")
     }
+
+
+    @Test
+    fun `should not throw anything on get`() {
+        assertDoesNotThrow {
+            logger.debug("firstname " + singUpModel.firstname)
+            logger.debug("lastname " + singUpModel.lastname)
+            logger.debug("phone " + singUpModel.phone)
+            logger.debug("password " + singUpModel.password)
+            logger.debug("passwordConfirmation " + singUpModel.passwordConfirmation)
+            logger.debug("age " + singUpModel.age)
+            logger.debug("type " + singUpModel.type)
+        }
+        logger.debug("Request is perfect with gets.")
+    }
+    @Test
+    fun `should not throw anything on set`() {
+        assertDoesNotThrow {
+            singUpModel.firstname = ""
+            singUpModel.lastname = ""
+            singUpModel.phone = ""
+            singUpModel.password = ""
+            singUpModel.passwordConfirmation = ""
+            singUpModel.age = 12
+            singUpModel.type = UserType.EMPLOYER
+        }
+        logger.debug("Request is perfect with sets.")
+    }
+
 
 }
